@@ -193,5 +193,8 @@ cdef md5sum(msg):
 
 cdef to_hash = open('512MB.zip', "rb")
 cdef data = to_hash.read()
-print(md5sum(data))
+print("Size in bytes:", os.path.getsize("512MB.zip"))
+print("Hash:", md5sum(data))
 to_hash.close()
+
+# python setup.py build_ext --inplace

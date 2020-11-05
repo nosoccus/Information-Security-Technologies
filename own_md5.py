@@ -222,5 +222,6 @@ if __name__ == "__main__":
             exit()
         to_hash = open(filename, "rb")
         data = to_hash.read()
-        print(md5sum(data))
+        print("Size in bytes:", os.path.getsize(filename))
+        print("Hash:", md5sum(data))
         to_hash.close()
