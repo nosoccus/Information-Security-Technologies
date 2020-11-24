@@ -2,8 +2,11 @@ import binascii
 import sys
 import os.path
 
+# Для перевірки
+from string_check import md5
+
 # Константи для підвищення криптостійкості
-cdef T = [0xd76aa478, 0xe8c7b756, 0x242070db, 0xc1bdceee, 0xf57c0faf,
+T = [0xd76aa478, 0xe8c7b756, 0x242070db, 0xc1bdceee, 0xf57c0faf,
      0x4787c62a, 0xa8304613, 0xfd469501, 0x698098d8, 0x8b44f7af,
      0xffff5bb1, 0x895cd7be, 0x6b901122, 0xfd987193, 0xa679438e,
      0x49b40821, 0xf61e2562, 0xc040b340, 0x265e5a51, 0xe9b6c7aa,
@@ -19,18 +22,18 @@ cdef T = [0xd76aa478, 0xe8c7b756, 0x242070db, 0xc1bdceee, 0xf57c0faf,
 
 
 # Циклічний зсув вліво (після кожного кроку)
-cdef left_circular_shift(k, bits):
+def left_circular_shift(k, bits):
     bits = bits % 32
     k = k % (2**32)
-    cdef upper = (k << bits) % (2**32)
-    cdef result1 = upper | (k >> (32 - bits))
-    return result1
+    upper = (k << bits) % (2**32)
+    result = upper | (k >> (32 - bits))
+    return result
 
 
-# Ця функція ділить блок повідомлень на 16 блоків по 32-біт
-cdef block_divide(block, chunks):
-    cdef result = []
-    cdef size = len(block)//chunks
+# Крок 4. Ця функція ділить блок повідомлень на 16 блоків по 32-біт (512 біт)
+def block_divide(block, chunks):
+    result = []
+    size = len(block)//chunks
     for i in range(0, chunks):
         result.append(int.from_bytes(block[i*size:(i+1)*size], byteorder="little"))
     return result
@@ -39,71 +42,73 @@ cdef block_divide(block, chunks):
 # Логічні функції потрібні для «перемішування» інформації, підвищення криптостійкості.
 # Кожна з цих функцій приймає на вхід три 32-бітних змінні, і повертає теж 32-бітну змінну.
 
-cdef F(X, Y, Z):
+def F(X, Y, Z):
     return (X & Y) | ((~X) & Z)
 
 
-cdef G(X, Y, Z):
+def G(X, Y, Z):
     return (X & Z) | (Y & (~Z))
 
 
-cdef H(X, Y, Z):
+def H(X, Y, Z):
     return X ^ Y ^ Z
 
 
-cdef I(X, Y, Z):
+def I(X, Y, Z):
     return Y ^ (X | (~Z))
 
 
 # Функції для розрахунку раундів
 
-cdef FF(a, b, c, d, M, s, t):
-    cdef result = b + left_circular_shift((a + F(b, c, d) + M + t), s)
+def FF(a, b, c, d, M, s, t):
+    result = b + left_circular_shift((a + F(b, c, d) + M + t), s)
     return result
 
 
-cdef GG(a, b, c, d, M, s, t):
-    cdef result = b + left_circular_shift((a + G(b, c, d) + M + t), s)
+def GG(a, b, c, d, M, s, t):
+    result = b + left_circular_shift((a + G(b, c, d) + M + t), s)
     return result
 
 
-cdef HH(a, b, c, d, M, s, t):
-    cdef result = b + left_circular_shift((a + H(b, c, d) + M + t), s)
+def HH(a, b, c, d, M, s, t):
+    result = b + left_circular_shift((a + H(b, c, d) + M + t), s)
     return result
 
 
-cdef II(a, b, c, d, M, s, t):
-    cdef result = b + left_circular_shift((a + I(b, c, d) + M + t), s)
+def II(a, b, c, d, M, s, t):
+    result = b + left_circular_shift((a + I(b, c, d) + M + t), s)
     return result
 
 
 # hexadecimal value with the smallest bytes
-cdef fmt8(num):
-    cdef bighex = "{0:08x}".format(num)
-    cdef binver = binascii.unhexlify(bighex)
-    cdef result3 = "{0:08x}".format(int.from_bytes(binver, byteorder='little'))
-    return result3
+def fmt8(num):
+    bighex = "{0:08x}".format(num)
+    binver = binascii.unhexlify(bighex)
+    result = "{0:08x}".format(int.from_bytes(binver, byteorder='little'))
+    return result
 
 
 # Повернути довжину бітстрічки
-cdef bitlen(bitstring):
+def bitlen(bitstring):
     return len(bitstring)*8
 
 
-cdef md5sum(msg):
-    cdef msgLen = bitlen(msg) % (2**64)
+# Головна функція алгоритму хешування
+def md5sum(msg):
+    # Крок 1. Додавання доповнення.
+    msgLen = bitlen(msg) % (2**64)
     msg = msg + b'\x80'
-    cdef zeroPad = (448 - (msgLen+8) % 512) % 512
+    zeroPad = (448 - (msgLen+8) % 512) % 512
     zeroPad //= 8
     msg = msg + b'\x00'*zeroPad + msgLen.to_bytes(8, byteorder='little')
     msgLen = bitlen(msg)
-    cdef iterations = msgLen // 512
+    iterations = msgLen // 512
 
-    # Буфер ланцюгових змінних
-    cdef A = 0x67452301
-    cdef B = 0xefcdab89
-    cdef C = 0x98badcfe
-    cdef D = 0x10325476
+    # Буфер MD-змінних
+    A = 0x67452301
+    B = 0xefcdab89
+    C = 0x98badcfe
+    D = 0x10325476
 
     # Голований цикл
     for i in range(0, iterations):
@@ -187,14 +192,36 @@ cdef md5sum(msg):
         C = (C + c) % (2**32)
         D = (D + d) % (2**32)
 
-    cdef result2 = fmt8(A) + fmt8(B) + fmt8(C) + fmt8(D)
-    return result2
+    result = fmt8(A) + fmt8(B) + fmt8(C) + fmt8(D)
+    return result
 
 
-cdef to_hash = open('512MB.zip', "rb")
-cdef data = to_hash.read()
-print("Size in bytes:", os.path.getsize("512MB.zip"))
-print("Hash:", md5sum(data))
-to_hash.close()
-
-# python setup.py build_ext --inplace
+if __name__ == "__main__":
+    if len(sys.argv) <= 1:
+        message = input("Please, enter a string: ")
+        bit_msg = bytearray()
+        bit_msg.extend(map(ord, message))
+        print(md5sum(bit_msg))
+    elif sys.argv[1] == "test":
+        rfc = ["", "a", "abc", "message digest", "abcdefghijklmnopqrstuvwxyz",
+               "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789",
+               "12345678901234567890123456789012345678901234567890123456789012345678901234567890"]
+        for i in rfc:
+            ownb = bytearray()
+            ownb.extend(map(ord, i))
+            own = md5sum(ownb)
+            check = md5(i)
+            print("Message:", i)
+            print("Own function:", own)
+            print("Built-in fun:", check)
+            print("Integrity:", own == check, "\n")
+    else:
+        filename = sys.argv[1]
+        if not os.path.exists(filename):
+            print("File does not exist.")
+            exit()
+        to_hash = open(filename, "rb")
+        data = to_hash.read()
+        print("Size in bytes:", os.path.getsize(filename))
+        print("Hash:", md5sum(data))
+        to_hash.close()

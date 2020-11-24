@@ -9,4 +9,4 @@ def md5(fname):
     return hash_md5.hexdigest()
 
 
-print(md5("512MB.zip"))
+print(md5("file.txt"))
