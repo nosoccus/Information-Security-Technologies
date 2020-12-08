@@ -1,6 +1,6 @@
 # RC5-CBC-Pad Implementation
 ## Task:
- Create a software implementation of the RC5 algorithm. Testing of the created program is carried out using test hash values (according to RFC 1321).
+ Create a software implementation of the RC5 algorithm.
 
 
 ## Requirements:
@@ -16,3 +16,4 @@
  - [```md5.py```](https://github.com/nosoccus/information-security-technologies/blob/main/RC5/md5.py) - contains the implemetation of MD5 from the previous task.
  - [```lab1.py```](https://github.com/nosoccus/information-security-technologies/blob/main/RC5/lab1.py) - contains pseudo-random generator.
  
+Run ```main.py``` and follow the instructions. The program will require to choose files for reading and writing.
