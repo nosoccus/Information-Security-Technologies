@@ -2,10 +2,6 @@ import sys
 from lab1 import generator
 from md5 import md5sum
 
-w = 16  # довжина слова в бітах
-r = 20  # кількість раундів
-b = 16  # довжина ключа в байтах
-
 
 # Хешування паролю
 def key_hash(password):
@@ -175,28 +171,33 @@ class RC5(BlockPreparation):
             cbc = temp
 
 
-while True:
-    option = int(input("1 - encrypt\n2 - decrypt\n"))
+if __name__ == "__main__":
+    w = 16  # довжина слова в бітах
+    r = 20  # кількість раундів
+    b = 16  # довжина ключа в байтах
 
-    if option == 1:
-        read_file = input("Enter a filename to read for encryption: ")
-        write_file = input("Enter a filename to write encrypted: ")
-        password = input("Enter a password: ")
+    while True:
+        option = int(input("1 - encrypt\n2 - decrypt\n"))
 
-        key = key_hash(password)
-        cypher = RC5(key, w, r)
-        cypher.encryption(read_file, write_file)
-        print("Encrypted\n")
+        if option == 1:
+            read_file = input("Enter a filename to read for encryption: ")
+            write_file = input("Enter a filename to write encrypted: ")
+            password = input("Enter a password: ")
 
-    elif option == 2:
-        read_file = input("Enter a filename to read for decryption: ")
-        write_file = input("Enter a filename to write decrypted: ")
-        password = input("Enter a password: ")
+            key = key_hash(password)
+            cypher = RC5(key, w, r)
+            cypher.encryption(read_file, write_file)
+            print("Encrypted\n")
 
-        key = key_hash(password)
-        cypher = RC5(key, w, r)
-        cypher.decryption(read_file, write_file)
-        print("Decrypted\n")
+        elif option == 2:
+            read_file = input("Enter a filename to read for decryption: ")
+            write_file = input("Enter a filename to write decrypted: ")
+            password = input("Enter a password: ")
 
-    else:
-        sys.exit(0)
+            key = key_hash(password)
+            cypher = RC5(key, w, r)
+            cypher.decryption(read_file, write_file)
+            print("Decrypted\n")
+
+        else:
+            sys.exit(0)
