@@ -5,3 +5,4 @@
 - #### [MD5 Implementation](https://github.com/nosoccus/information-security-technologies/tree/main/MD5)
 - #### [RC5 Implemetation](https://github.com/nosoccus/information-security-technologies/tree/main/RC5)
 - #### [RSA Realization](https://github.com/nosoccus/information-security-technologies/tree/main/RSA)
+- #### [DSA Realization](https://github.com/nosoccus/information-security-technologies/tree/main/DSA)
