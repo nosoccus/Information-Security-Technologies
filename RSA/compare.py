@@ -1,5 +1,6 @@
-import rc5
 import time
+
+import modules.rc5 as rc5
 
 
 w = 16  # довжина слова в бітах

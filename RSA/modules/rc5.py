@@ -1,6 +1,6 @@
 import sys
-from lab1 import generator
-from md5 import md5sum
+from modules.lab1 import generator
+from modules.md5 import md5sum
 
 
 # Хешування паролю
